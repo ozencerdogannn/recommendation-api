@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 import numpy as np
 import pickle
@@ -18,6 +19,14 @@ x = data[['LISTPRICE', 'CATEGORYNAME_ENCODED', 'COLOR_WEIGHTED', 'ORDERQTY']]
 x_scaled = scaler.transform(x)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Veya spesifik olarak ["http://127.0.0.1:5500"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class ProductRequest(BaseModel):
     index: int
@@ -38,6 +47,8 @@ def get_recommendations(request: ProductRequest):
         "selected_product": selected.to_dict(),
         "recommended_products": recommended.to_dict(orient='records')
     }
+
+
 
 # @app.post("/recommendations/")
 # def get_recommendations(request: ProductRequest):
